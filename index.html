@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-Okul Performans Ölçeği DOCX Oluşturucu</title>
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Main CSS -->
+  
+  <!-- PDF.js library for client-side PDF parsing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script type="module" crossorigin src="./assets/index-VEi1Bpc9.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-DFm5UIqB.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-content container">
+        <div class="logo-area">
+          <svg width="40" height="40" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="64" height="64" rx="16" fill="url(#brand-grad)" />
+            <path d="M18 42V22C18 20.8954 18.8954 20 20 20H38C39.1046 20 40 20.8954 40 22V42C40 43.1046 39.1046 44 38 44H20C18.8954 44 18 43.1046 18 42Z" stroke="white" stroke-width="2.5" />
+            <path d="M24 28H34" stroke="white" stroke-width="2.5" stroke-linecap="round" />
+            <path d="M24 34H34" stroke="white" stroke-width="2.5" stroke-linecap="round" />
+            <circle cx="44" cy="20" r="6" fill="#10B981" />
+            <path d="M42 20.5L43.5 22L46.5 19" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            <defs>
+              <linearGradient id="brand-grad" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#6366F1" />
+                <stop offset="1" stop-color="#8B5CF6" />
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="logo-text">
+            <h1>E-Okul Performans Ölçeği</h1>
+            <p>Resmi MEB DOCX Belgesi Oluşturucu</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <span class="badge badge-primary">v1.0.0</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="app-main container">
+      <!-- Wizard Steps Stepper -->
+      <div class="stepper" id="stepper">
+        <div class="step active" id="step-node-upload">
+          <div class="step-circle">1</div>
+          <div class="step-label">Dosya Yükle</div>
+        </div>
+        <div class="step" id="step-node-configure">
+          <div class="step-circle">2</div>
+          <div class="step-label">Yapılandır</div>
+        </div>
+        <div class="step" id="step-node-preview">
+          <div class="step-circle">3</div>
+          <div class="step-label">Önizle</div>
+        </div>
+        <div class="step" id="step-node-export">
+          <div class="step-circle">4</div>
+          <div class="step-label">Belgeleri İndir</div>
+        </div>
+      </div>
+
+      <!-- Step Panels -->
+      <div class="step-panels">
+        <!-- 1. Dosya Yükleme Paneli -->
+        <div class="step-panel active" id="panel-upload">
+          <div id="file-uploader-container"></div>
+        </div>
+
+        <!-- 2. Yapılandırma Paneli -->
+        <div class="step-panel" id="panel-configure">
+          <div class="grid-2col">
+            <div class="config-sidebar">
+              <div id="metadata-display-container" class="mb-4"></div>
+              <div id="section-manager-container"></div>
+            </div>
+            <div class="config-main">
+              <div id="kriter-config-container"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Önizleme Paneli -->
+        <div class="step-panel" id="panel-preview">
+          <div id="preview-container"></div>
+        </div>
+
+        <!-- 4. Dışa Aktarma Paneli -->
+        <div class="step-panel" id="panel-export">
+          <div id="export-container"></div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div class="footer-content container text-center">
+        <p>© 2026 E-Okul Performans Ölçeği Oluşturucu. Geliştirici: <strong>Murat ÖRGÜT</strong></p>
+        <p style="font-size: 0.75rem; margin-top: 4px; color: var(--text-muted);">Google Antigravity Architecture</p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Entry Script -->
+</body>
+</html>
