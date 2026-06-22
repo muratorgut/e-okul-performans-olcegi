@@ -1,0 +1,38 @@
+# Dependency directories
+node_modules/
+
+# Build outputs
+dist/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# IDEs and editors
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Local test scripts
+scratch_debug_meta.js
+analyze_xls.py
+check_pdf_libs.py
+read_pdf.py
+debug_hulya.js
+
+# Personal test data (XLS and PDF templates containing student data)
+*.XLS
+*.xls
+*.xlsx
+*.pdf
