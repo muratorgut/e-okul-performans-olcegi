@@ -334,7 +334,9 @@ export class FileParserService {
       throw new Error('PDF.js kütüphanesi yüklenemedi.');
     }
 
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    if (typeof window !== 'undefined' && window.document) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
 
     const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(arrayBuffer) });
     const pdf = await loadingTask.promise;
@@ -344,48 +346,79 @@ export class FileParserService {
     for (let i = 1; i <= numPages; i++) {
       const page = await pdf.getPage(i);
       const textContent = await page.getTextContent();
-      const textItems = textContent.items.map(item => item.str);
-      const pageText = textItems.join(' ');
-
-      const parts = pageText.split(":");
-      if (parts.length >= 6) {
-        // Sınıfı/Şubesi genellikle 4. indekstedir
-        let sinif = parts[4].trim();
-        sinif = sinif.split("Sıra")[0].split("Dersin")[0].split("Haftalık")[0].split("Ders Yılı")[0].trim();
-        sinif = sinif.replace(/^[A-ZÇĞİÖŞÜa-zçğıöşüİı]+\s*[\-\–\—\−]\s*/i, '').trim();
-
-        // Dersin Adı genellikle 5. indekstedir
-        let ders = parts[5].trim();
-        ders = ders.split("Sıra")[0].split("Haftalık")[0].split("Y A Z I L I")[0].split("Ö Ğ R E N C İ")[0].trim();
-
-        // Temizleme sonrası boş kalırsa veya anormal uzunluktaysa regex fallback yap
-        if (!sinif || sinif.length > 50) {
-          const match = pageText.match(/Sınıfı\s*\/\s*Şubesi\s*:\s*([^:\n\r]+)/i);
-          sinif = match ? match[1].split("Dersin")[0].trim() : '';
-          sinif = sinif.replace(/^[A-ZÇĞİÖŞÜa-zçğıöşüİı]+\s*[\-\–\—\−]\s*/i, '').trim();
+      
+      // 1. Satır gruplama (Y koordinatına göre)
+      const lines = [];
+      textContent.items.forEach(item => {
+        if (item.str === undefined) return;
+        const x = item.transform[4];
+        const y = item.transform[5];
+        const fontSize = item.transform[0];
+        
+        let line = lines.find(l => Math.abs(l.y - y) < 4);
+        if (!line) {
+          line = { y: y, items: [] };
+          lines.push(line);
         }
-        if (!ders || ders.length > 50) {
-          const match = pageText.match(/Dersin\s*Adı\s*:\s*([^:\n\r]+)/i);
-          ders = match ? match[1].split("Sıra")[0].trim() : '';
+        line.items.push({ str: item.str, x: x, fontSize: fontSize });
+      });
+      
+      // 2. Satırları yukarıdan aşağıya sırala
+      lines.sort((a, b) => b.y - a.y);
+      
+      // 3. Karakterleri soldan sağa birleştir ve harf arası gereksiz boşlukları normalize et
+      const lineTexts = lines.map(line => {
+        line.items.sort((a, b) => a.x - b.x);
+        
+        let text = "";
+        let lastX = -1;
+        let lastWidth = 0;
+        
+        line.items.forEach((item, idx) => {
+          if (idx === 0) {
+            text += item.str;
+          } else {
+            const gap = item.x - (lastX + lastWidth);
+            const threshold = item.fontSize * 0.7; // Türkçe karakter ayrışmasını önleyen optimal eşik oranı
+            const needsSpace = gap > threshold && !text.endsWith(' ') && !item.str.startsWith(' ');
+            if (needsSpace) {
+              text += ' ' + item.str;
+            } else {
+              text += item.str;
+            }
+          }
+          lastX = item.x;
+          lastWidth = item.str.length * item.fontSize * 0.45;
+        });
+        
+        return text.trim();
+      });
+
+      // 4. Anahtar satırları bul ve değerlerini çöz
+      const sinifLine = lineTexts.find(l => l.includes("Sınıfı / Şubesi") || l.includes("Sınıfı/Şubesi") || l.includes("Şubesi"));
+      const dersLine = lineTexts.find(l => l.includes("Dersin Adı") || l.includes("Dersin"));
+
+      let sinif = '';
+      if (sinifLine) {
+        const parts = sinifLine.split(':');
+        if (parts.length >= 2) {
+          sinif = parts.slice(1).join(':').trim();
         }
-
-        pageMeta.push({
-          sinifSubesi: sinif,
-          dersAdi: ders
-        });
-      } else {
-        // Fallback regex araması
-        const sinifMatch = pageText.match(/Sınıfı\s*\/\s*Şubesi\s*:\s*([^:\n\r]+)/i);
-        const dersMatch = pageText.match(/Dersin\s*Adı\s*:\s*([^:\n\r]+)/i);
-
-        const sinif = sinifMatch ? sinifMatch[1].split("Dersin")[0].trim() : '';
-        const cleanSinif = sinif.replace(/^[A-ZÇĞİÖŞÜa-zçğıöşüİı]+\s*[\-\–\—\−]\s*/i, '').trim();
-
-        pageMeta.push({
-          sinifSubesi: cleanSinif,
-          dersAdi: dersMatch ? dersMatch[1].split("Sıra")[0].trim() : ''
-        });
       }
+      sinif = sinif.replace(/^[A-ZÇĞİÖŞÜa-zçğıöşüİı]+\s*[\-\–\—\−]\s*/i, '').trim();
+
+      let ders = '';
+      if (dersLine) {
+        const parts = dersLine.split(':');
+        if (parts.length >= 2) {
+          ders = parts.slice(1).join(':').trim();
+        }
+      }
+
+      pageMeta.push({
+        sinifSubesi: sinif,
+        dersAdi: ders
+      });
     }
 
     return pageMeta;
