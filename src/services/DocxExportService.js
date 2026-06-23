@@ -83,7 +83,15 @@ export class DocxExportService {
     });
 
     // Öğretmen branş eki düzenlemesi (örn: KİMYA -> KİMYA ÖĞRETMENİ)
-    const bransRaw = globalMeta.ogretmenBrans || '';
+    // Eğer branş adı varsayılan ders adıyla aynıysa veya boşsa, bölümün (sınıfın) kendi ders adını kullanırız.
+    const isDefaultBranch = !globalMeta.ogretmenBrans || 
+      globalMeta.ogretmenBrans.trim() === '' || 
+      globalMeta.ogretmenBrans.trim().toLowerCase() === (globalMeta.dersAdi || '').trim().toLowerCase();
+
+    const bransRaw = isDefaultBranch 
+      ? (section.dersAdi || globalMeta.ogretmenBrans || '')
+      : globalMeta.ogretmenBrans;
+
     const bransHeader = bransRaw.toUpperCase().includes('ÖĞRETMEN')
       ? bransRaw.toUpperCase()
       : `${bransRaw.toUpperCase()} ÖĞRETMENİ`;
