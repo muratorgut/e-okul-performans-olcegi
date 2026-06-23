@@ -89,11 +89,11 @@ export class DocxExportService {
       : `${bransRaw.toUpperCase()} ÖĞRETMENİ`;
 
     // Tablosuz, TabStop ile Hizalanmış İmza Paragrafları
-    // A4 yatay sayfa net genişliği 15398 DXA civarıdır.
-    // Sol sütun merkezi 2200 DXA (sol tarafa yaklaştırıldı), Sağ sütun merkezi 12500 DXA (ortalanmış olarak sağ tarafa alındı)
+    // A4 dikey sayfa net genişliği 10466 DXA civarıdır.
+    // Sol sütun merkezi 2000 DXA, Sağ sütun merkezi 8200 DXA
     const signTabStops = [
-      { type: TabStopType.CENTER, position: 1600 },
-      { type: TabStopType.CENTER, position: 12200 }
+      { type: TabStopType.CENTER, position: 2000 },
+      { type: TabStopType.CENTER, position: 8200 }
     ];
 
     const signParagraphs = [
@@ -139,7 +139,7 @@ export class DocxExportService {
     return {
       properties: {
         page: {
-          size: { orientation: PageOrientation.LANDSCAPE, width: 16838, height: 11906 },
+          size: { orientation: PageOrientation.PORTRAIT, width: 11906, height: 16838 },
           margin: {
             top: convertInchesToTwip(0.5),
             bottom: convertInchesToTwip(0.5),
